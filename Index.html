@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Number Sum Game — MF Gabru Style 😎</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #0b1220;
+      --accent: #06b6d4;
+      --muted: #94a3b8;
+      --ok: #10b981;
+      --err: #ef4444;
+      --warn: #f59e0b;
+      --text: #e6eef6;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(180deg, #071024 0%, #07112b 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      line-height: 1.5;
+    }
+    .card {
+      width: 100%;
+      max-width: 100%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.03);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%);
+      z-index: -1;
+      animation: rotate 20s linear infinite;
+    }
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      letter-spacing: 0.4px;
+      background: linear-gradient(90deg, var(--accent), #22c1c3);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+    }
+    p.muted {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-direction: column;
+    }
+    .numbers-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+    }
+    .option {
+      flex: 1;
+      background: rgba(255,255,255,0.02);
+      padding: 18px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: #f8fafc;
+      border: 1px solid rgba(255,255,255,0.03);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      min-width: 80px;
+    }
+    .plus {
+      font-size: 24px;
+      color: var(--muted);
+      width: 44px;
+      text-align: center;
+    }
+    .answer-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      width: 100%;
+      flex-direction: column;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(0,0,0,0.3);
+      color: var(--text);
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    input[type="number"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(6,182,212,0.2);
+    }
+    .buttons-row {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+    button {
+      padding: 12px;
+      border-radius: 10px;
+      border: 0;
+      cursor: pointer;
+      font-weight: 600;
+      background: linear-gradient(90deg, var(--accent), #22c1c3);
+      color: #021122;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex: 1;
+      font-size: 14px;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(6,182,212,0.3);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    button.secondary {
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+    }
+    button.secondary:hover {
+      background: rgba(255,255,255,0.1);
+      box-shadow: 0 4px 8px rgba(255,255,255,0.1);
+    }
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      width: 100%;
+    }
+    .meta {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .progress {
+      height: 10px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 999px;
+      overflow: hidden;
+      flex: 1;
+    }
+    .progress > i {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--ok), #22c1c3);
+      transition: width 300ms ease;
+      border-radius: 999px;
+    }
+    .msg {
+      margin-top: 12px;
+      font-size: 15px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+    .msg.ok {
+      color: var(--ok);
+      background: rgba(16,185,129,0.1);
+    }
+    .msg.err {
+      color: var(--err);
+      background: rgba(239,68,68,0.1);
+    }
+    .msg.warn {
+      color: var(--warn);
+      background: rgba(245,158,11,0.1);
+    }
+    footer {
+      margin-top: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .stats {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .stat-box {
+      background: rgba(255,255,255,0.02);
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.03);
+      min-width: calc(50% - 6px);
+      box-sizing: border-box;
+    }
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .timer {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .difficulty-selector {
+      margin-bottom: 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .difficulty-btn {
+      padding: 8px 12px;
+      font-size: 13px;
+      border-radius: 6px;
+      flex: 1;
+    }
+    .active-difficulty {
+      background: var(--accent);
+      color: #021122;
+    }
+    @media (min-width: 480px) {
+      .row {
+        flex-direction: row;
+      }
+      .numbers-row {
+        flex-direction: row;
+      }
+      .answer-row {
+        flex-direction: row;
+      }
+      .option {
+        font-size: 32px;
+        padding: 20px;
+      }
+      .stat-box {
+        min-width: calc(25% - 10px);
+      }
+      h1 {
+        font-size: 24px;
+      }
+      button {
+        padding: 12px 16px;
+        font-size: 16px;
+      }
+    }
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: #f00;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="gameCard">
+    <h1><i class="fas fa-calculator"></i> Number Sum Game — MF Gabru Style 😎</h1>
+    <p class="muted">Sahi jawab do, level barhta jayega. Enter dabao ya "Check" kro. Reach 100 to jeet jayega 🎉</p>
+
+    <div class="difficulty-selector">
+      <button class="difficulty-btn active-difficulty" data-difficulty="easy">Easy</button>
+      <button class="difficulty-btn secondary" data-difficulty="medium">Medium</button>
+      <button class="difficulty-btn secondary" data-difficulty="hard">Hard</button>
+    </div>
+
+    <div class="row">
+      <div class="numbers-row">
+        <div class="option" id="optA">1</div>
+        <div class="plus">+</div>
+        <div class="option" id="optB">1</div>
+      </div>
+      
+      <div class="answer-row">
+        <input id="answer" type="number" inputmode="numeric" placeholder="Enter sum here" autofocus />
+        <div class="buttons-row">
+          <button id="checkBtn"><i class="fas fa-check"></i> Check</button>
+          <button id="skipBtn" class="secondary" title="Skip to next question"><i class="fas fa-forward"></i> Skip</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div style="flex:1">
+        <div class="progress" aria-hidden="true"><i id="progBar"></i></div>
+      </div>
+      <div style="min-width:98px; text-align:right;" id="levelLabel">Level: <span class="timer">1</span> / 100</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-value" id="score">0</div>
+        <div class="stat-label">Score</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="streak">0</div>
+        <div class="stat-label">Streak</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="time">0s</div>
+        <div class="stat-label">Time</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="hints">3</div>
+        <div class="stat-label">Hints Left</div>
+      </div>
+    </div>
+
+    <div class="meta">
+      <button id="hintBtn" class="secondary"><i class="fas fa-lightbulb"></i> Hint</button>
+      <button id="soundBtn" class="secondary"><i class="fas fa-volume-up"></i> Sound</button>
+      <button id="restart" class="secondary"><i class="fas fa-redo"></i> Restart</button>
+    </div>
+
+    <div class="msg" id="message"></div>
+
+    <footer>Designed for you — खोल के खेलो और मज़े करो 😄 | <i class="fas fa-heart" style="color:#ef4444"></i></footer>
+  </div>
+
+  <audio id="correctSound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" preload="auto"></audio>
+  <audio id="wrongSound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
+  <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" preload="auto"></audio>
+
+  <script>
+    (function(){
+      // Game state
+      let a = 1, b = 1;
+      let level = 1;
+      const MAX_LEVEL = 100;
+      let score = 0;
+      let streak = 0;
+      let startTime = null;
+      let timerInterval = null;
+      let difficulty = 'easy';
+      let hintsLeft = 3;
+      let soundOn = true;
+
+      // DOM elements
+      const optA = document.getElementById('optA');
+      const optB = document.getElementById('optB');
+      const answerInput = document.getElementById('answer');
+      const checkBtn = document.getElementById('checkBtn');
+      const skipBtn = document.getElementById('skipBtn');
+      const restartBtn = document.getElementById('restart');
+      const message = document.getElementById('message');
+      const levelLabel = document.getElementById('levelLabel');
+      const progBar = document.getElementById('progBar');
+      const scoreLabel = document.getElementById('score');
+      const streakLabel = document.getElementById('streak');
+      const timeLabel = document.getElementById('time');
+      const hintBtn = document.getElementById('hintBtn');
+      const hintsLabel = document.getElementById('hints');
+      const soundBtn = document.getElementById('soundBtn');
+      const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+      const gameCard = document.getElementById('gameCard');
+      const correctSound = document.getElementById('correctSound');
+      const wrongSound = document.getElementById('wrongSound');
+      const winSound = document.getElementById('winSound');
+
+      // Initialize game
+      function initGame() {
+        a = 1;
+        b = 1;
+        level = 1;
+        score = 0;
+        streak = 0;
+        hintsLeft = 3;
+        updateHintButton();
+        startTimer();
+        render();
+      }
+
+      // Start timer
+      function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        startTime = new Date();
+        timerInterval = setInterval(updateTimer, 1000);
+      }
+
+      // Update timer display
+      function updateTimer() {
+        const now = new Date();
+        const seconds = Math.floor((now - startTime) / 1000);
+        timeLabel.textContent = `${seconds}s`;
+      }
+
+      // Update hint button text
+      function updateHintButton() {
+        hintsLabel.textContent = hintsLeft;
+        hintBtn.innerHTML = `<i class="fas fa-lightbulb"></i> ${hintsLeft > 0 ? 'Hint' : 'No Hints'}`;
+        hintBtn.disabled = hintsLeft <= 0;
+      }
+
+      // Render game state
+      function render(){
+        optA.textContent = a;
+        optB.textContent = b;
+        levelLabel.innerHTML = 'Level: <span class="timer">' + level + '</span> / ' + MAX_LEVEL;
+        scoreLabel.textContent = score;
+        streakLabel.textContent = streak;
+        const pct = Math.min(100, Math.round((level-1)/(MAX_LEVEL-1)*100));
+        progBar.style.width = pct + '%';
+        message.textContent = '';
+        message.className = 'msg';
+        answerInput.value = '';
+        answerInput.focus();
+      }
+
+      // Show message
+      function showMessage(text, type = '') {
+        message.textContent = text;
+        message.className = `msg ${type}`;
+      }
+
+      // Show error
+      function showError(text) {
+        showMessage(text, 'err');
+        if (soundOn) wrongSound.play().catch(e => console.log('Audio error:', e));
+        setTimeout(() => {
+          if (message.className === 'msg err') {
+            message.textContent = '';
+            message.className = 'msg';
+          }
+        }, 2000);
+      }
+
+      // Next step in game
+      function nextStep(correct) {
+        if (correct) {
+          score++;
+          streak++;
+          showMessage('सही! अगले पे जा रहे हैं...', 'ok');
+          if (soundOn) correctSound.play().catch(e => console.log('Audio error:', e));
+        } else {
+          streak = 0;
+        }
+
+        // Get next numbers based on difficulty
+        const sum = a + b;
+        switch(difficulty) {
+          case 'easy':
+            a = sum;
+            b = 1;
+            break;
+          case 'medium':
+            a = sum;
+            b = Math.floor(Math.random() * 3) + 1; // 1-3
+            break;
+          case 'hard':
+            a = sum;
+            b = Math.floor(Math.random() * 10) + 1; // 1-10
+            break;
+        }
+
+        level++;
+        
+        if (level > MAX_LEVEL) {
+          gameWon();
+          return;
+        }
+
+        setTimeout(() => render(), correct ? 800 : 300);
+      }
+
+      // Game won
+      function gameWon() {
+        optA.textContent = '🎉';
+        optB.textContent = '🎉';
+        levelLabel.textContent = 'Completed!';
+        showMessage('बधाई! तुमने लक्ष्य पूरा कर लिया — 100 तक पहुँच गए 🎉', 'ok');
+        progBar.style.width = '100%';
+        checkBtn.disabled = true;
+        skipBtn.disabled = true;
+        answerInput.disabled = true;
+        clearInterval(timerInterval);
+        if (soundOn) winSound.play().catch(e => console.log('Audio error:', e));
+        createConfetti();
+      }
+
+      // Create confetti effect
+      function createConfetti() {
+        const colors = ['#06b6d4', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6'];
+        for (let i = 0; i < 100; i++) {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.left = Math.random() * 100 + '%';
+          confetti.style.top = -10 + 'px';
+          confetti.style.width = Math.random() * 8 + 4 + 'px';
+          confetti.style.height = confetti.style.width;
+          confetti.style.opacity = Math.random();
+          gameCard.appendChild(confetti);
+          
+          const animationDuration = Math.random() * 3 + 2;
+          confetti.style.animation = `fall ${animationDuration}s linear forwards`;
+          
+          // Create keyframes for falling animation
+          const keyframes = `
+            @keyframes fall {
+              to {
+                transform: translateY(100vh) rotate(${Math.random() * 360}deg);
+                left: ${Math.random() * 100}%;
+              }
+            }
+          `;
+          
+          // Add style if not already added
+          if (!document.getElementById('confetti-animation')) {
+            const style = document.createElement('style');
+            style.id = 'confetti-animation';
+            style.innerHTML = keyframes;
+            document.head.appendChild(style);
+          }
+          
+          // Remove confetti after animation
+          setTimeout(() => {
+            confetti.remove();
+          }, animationDuration * 1000);
+        }
+      }
+
+      // Check answer
+      function checkAnswer() {
+        const user = answerInput.value.trim();
+        if (user === '') {
+          showError('Pehle number likho');
+          return;
+        }
+
+        // Parse number safely
+        const val = parseInt(user, 10);
+        if (isNaN(val)) {
+          showError('केवल number डालो (0-9)');
+          return;
+        }
+
+        const correctSum = a + b;
+        if (val === correctSum) {
+          nextStep(true);
+        } else {
+          showError('गलत जवाब — फिर से कोशिश करो');
+        }
+      }
+
+      // Give hint
+      function giveHint() {
+        if (hintsLeft <= 0) return;
+        
+        hintsLeft--;
+        updateHintButton();
+        
+        const correctSum = a + b;
+        const hint = correctSum.toString();
+        let revealed = '';
+        
+        // Reveal one digit at a time
+        for (let i = 0; i < hint.length; i++) {
+          setTimeout(() => {
+            revealed += hint[i];
+            answerInput.value = revealed;
+            answerInput.focus();
+          }, i * 300);
+        }
+        
+        showMessage(`Hint used! ${hintsLeft} hints remaining`, 'warn');
+      }
+
+      // Toggle sound
+      function toggleSound() {
+        soundOn = !soundOn;
+        soundBtn.innerHTML = `<i class="fas ${soundOn ? 'fa-volume-up' : 'fa-volume-mute'}"></i> ${soundOn ? 'Sound' : 'Muted'}`;
+      }
+
+      // Set difficulty
+      function setDifficulty(newDifficulty) {
+        difficulty = newDifficulty;
+        difficultyBtns.forEach(btn => {
+          if (btn.dataset.difficulty === difficulty) {
+            btn.classList.remove('secondary');
+            btn.classList.add('active-difficulty');
+          } else {
+            btn.classList.add('secondary');
+            btn.classList.remove('active-difficulty');
+          }
+        });
+        initGame();
+      }
+
+      // Event listeners
+      checkBtn.addEventListener('click', checkAnswer);
+      
+      answerInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          checkBtn.click();
+        }
+      });
+
+      skipBtn.addEventListener('click', function() {
+        showMessage('Skipped — आगे बढ़ रहे हैं', 'warn');
+        nextStep(false);
+      });
+
+      restartBtn.addEventListener('click', initGame);
+      
+      hintBtn.addEventListener('click', giveHint);
+      
+      soundBtn.addEventListener('click', toggleSound);
+      
+      difficultyBtns.forEach(btn => {
+        btn.addEventListener('click', () => setDifficulty(btn.dataset.difficulty));
+      });
+
+      // Initialize the game
+      initGame();
+
+    })();
+  </script>
+</body>
+</html>
